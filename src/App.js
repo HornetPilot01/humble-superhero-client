@@ -1,25 +1,38 @@
-import logo from './logo.svg';
-import './App.css';
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
+import HeroList from './components/HeroList';
+import HeroForm from './components/HeroForm';
 
-function App() {
+const App = () => {
+  const [heroes, setHeroes] = useState([]);
+
+  useEffect(() => {
+    axios.get('http://localhost:3000/superheroes/get_all')
+      .then(response => {
+        setHeroes(response.data);
+      })
+      .catch(error => {
+        console.error('Error fetching heroes:', error);
+      });
+  }, []);
+
+  const addHero = (hero) => {
+    axios.post('http://localhost:3000/superheroes/create_new', hero)
+      .then(response => {
+        setHeroes([...heroes, response.data]);
+      })
+      .catch(error => {
+        console.error('Error adding hero:', error);
+      });
+  };
+
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      <h1>Humble Superheroes</h1>
+      <HeroForm onAddHero={addHero} />
+      <HeroList heroes={heroes} />
     </div>
   );
-}
+};
 
 export default App;
