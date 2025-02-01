@@ -1,22 +1,31 @@
 import React, { useState } from 'react';
+import { addHero } from '../services/HeroService';
 
-const HeroForm = ({ addHero, error }) => {
+const HeroForm = ({ onAddHero }) => {
     const [name, setName] = useState('');
     const [superpower, setSuperpower] = useState('');
     const [humilityScore, setHumilityScore] = useState('');
+    const [error, setError] = useState(null);
 
-    const handleSubmit = (e) => {
-        e.preventDefault();
-        if (!name || !superpower || !humilityScore) {
-            return;
+    const handleSubmit = async (event) => {
+        event.preventDefault();
+
+        const newHero = {
+            name,
+            superpower,
+            humilityScore: parseInt(humilityScore, 10),
+        };
+
+        try {
+            const addedHero = await addHero(newHero);
+            onAddHero(addedHero);
+            setName('');
+            setSuperpower('');
+            setHumilityScore('');
+            setError(null);
+        } catch (error) {
+            setError('Failed to add hero. Please try again.' + error.message);
         }
-        if (isNaN(humilityScore) || humilityScore <= 0) {
-            return;
-        }
-        addHero({ name, superpower, humilityScore: parseFloat(humilityScore) });
-        setName('');
-        setSuperpower('');
-        setHumilityScore('');
     };
 
     return (

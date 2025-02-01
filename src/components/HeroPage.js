@@ -13,7 +13,7 @@ const HeroPage = () => {
     }, [heroes]);
 
     const addHero = (hero) => {
-        const newHero = { ...hero, id: heroes.length + 1 }; // додавання унікального id
+        const newHero = { ...hero, id: heroes.length + 1 };
         setHeroes([...heroes, newHero]);
     };
 

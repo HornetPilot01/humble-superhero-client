@@ -1,9 +1,27 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
+import { getAllHeroes } from '../services/HeroService';
 
-const HeroList = ({ heroes }) => {
+const HeroList = () => {
+    const [heroes, setHeroes] = useState([]);
+    const [error, setError] = useState(null);
+
+    const loadHeroes = async () => {
+        try {
+            const heroes = await getAllHeroes();
+            setHeroes(heroes);
+        } catch (error) {
+            setError('Failed to load heroes. Please try again.');
+        }
+    };
+
+    useEffect(() => {
+        loadHeroes();
+    }, []);
+
     return (
         <div className="hero-list-container">
             <h2 className="hero-list-title">Hero List</h2>
+            {error && <p className="error-message">{error}</p>}
             <table className="hero-table">
                 <thead>
                     <tr>
