@@ -1,25 +1,34 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
+import { getAllHeroes } from '../services/HeroService';
 import HeroForm from './HeroForm';
 import HeroList from './HeroList';
 import '../styles/HeroPage.css';
 
 const HeroPage = () => {
     const [heroes, setHeroes] = useState([]);
-    const [error, setError] = useState(null);
 
     useEffect(() => {
-        const sortedHeroes = [...heroes].sort((a, b) => b.humilityScore - a.humilityScore);
-        setHeroes(sortedHeroes);
-    }, [heroes]);
+        const subscription = getAllHeroes().subscribe({
+            next: (data) => setHeroes(data),
+            error: (err) => console.error('Error fetching heroes:', err)
+        });
 
-    const addHero = (hero) => {
-        const newHero = { ...hero, id: heroes.length + 1 };
-        setHeroes([...heroes, newHero]);
+        return () => subscription.unsubscribe();
+    }, []);
+
+    const handleAddHero = (newHero) => {
+        setHeroes((prevHeroes) => {
+            const updatedHeroes = [...prevHeroes, newHero];
+
+            updatedHeroes.sort((a, b) => b.humilityScore - a.humilityScore);
+
+            return updatedHeroes;
+        });
     };
 
     return (
         <div className="hero-page-container">
-            <HeroForm addHero={addHero} error={error} />
+            <HeroForm onAddHero={handleAddHero} />
             <HeroList heroes={heroes} />
         </div>
     );

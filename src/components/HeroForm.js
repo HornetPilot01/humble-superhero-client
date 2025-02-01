@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
 import { addHero } from '../services/HeroService';
+import { toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const HeroForm = ({ onAddHero }) => {
     const [name, setName] = useState('');
     const [superpower, setSuperpower] = useState('');
     const [humilityScore, setHumilityScore] = useState('');
-    const [error, setError] = useState(null);
 
     const handleSubmit = async (event) => {
         event.preventDefault();
@@ -16,26 +17,30 @@ const HeroForm = ({ onAddHero }) => {
             humilityScore: parseInt(humilityScore, 10),
         };
 
-        try {
-            const addedHero = await addHero(newHero);
-            onAddHero(addedHero);
-            setName('');
-            setSuperpower('');
-            setHumilityScore('');
-            setError(null);
-        } catch (error) {
-            setError('Failed to add hero. Please try again.' + error.message);
-        }
+        await addHero(newHero).subscribe({
+            next: (result) => {
+                onAddHero(result);
+            },
+            error: (error) => {
+                const errorMessage = error.response?.data?.message || 'Failed to add hero';
+                toast.error(errorMessage);
+            }
+
+        });
+
+        setName('');
+        setSuperpower('');
+        setHumilityScore('');
+        toast.success('Hero added successfully!');
     };
 
     return (
         <div className="hero-form-container">
             <h2 className="hero-form-title">Add a New Hero</h2>
-            {error && <p className="error-message">{error}</p>}
             <form onSubmit={handleSubmit} className="hero-form">
                 <div className="form-group">
-                    <label htmlFor="name" className="form-label">Hero Name</label>
                     <input
+                        placeholder='Hero Name'
                         type="text"
                         id="name"
                         className="form-input"
@@ -44,8 +49,8 @@ const HeroForm = ({ onAddHero }) => {
                     />
                 </div>
                 <div className="form-group">
-                    <label htmlFor="superpower" className="form-label">Superpower</label>
                     <input
+                        placeholder='Superpower'
                         type="text"
                         id="superpower"
                         className="form-input"
@@ -54,8 +59,8 @@ const HeroForm = ({ onAddHero }) => {
                     />
                 </div>
                 <div className="form-group">
-                    <label htmlFor="humilityScore" className="form-label">Humility Score</label>
                     <input
+                        placeholder='Humility Score'
                         type="number"
                         id="humilityScore"
                         className="form-input"
