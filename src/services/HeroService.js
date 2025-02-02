@@ -33,14 +33,14 @@ export const addHero = (newHero) => {
             from(response.json()).pipe(
                 mergeMap(result => {
                     if (!response.ok) {
-                        throw new Error(result.message || "Failed to add hero");
+                        throw new Error(result?.body?.message || "Failed to add hero");
                     }
                     return from([result]);
                 })
             )
         ),
         catchError(error => {
-            console.error('Error adding hero:', error);
+            console.error('Error adding hero:', error?.message);
             throw error;
         })
     );

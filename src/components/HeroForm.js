@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { addHero } from '../services/HeroService';
-import { toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
+import { ToastContainer, toast } from 'react-toastify';
 
 const HeroForm = ({ onAddHero }) => {
     const [name, setName] = useState('');
@@ -20,18 +19,16 @@ const HeroForm = ({ onAddHero }) => {
         await addHero(newHero).subscribe({
             next: (result) => {
                 onAddHero(result);
+                setName('');
+                setSuperpower('');
+                setHumilityScore('');
+
+                toast.success('Hero added successfully!');
             },
             error: (error) => {
-                const errorMessage = error.response?.data?.message || 'Failed to add hero';
-                toast.error(errorMessage);
+                toast.error(error?.message || 'Failed to add hero');
             }
-
         });
-
-        setName('');
-        setSuperpower('');
-        setHumilityScore('');
-        toast.success('Hero added successfully!');
     };
 
     return (
@@ -70,6 +67,8 @@ const HeroForm = ({ onAddHero }) => {
                 </div>
                 <button type="submit" className="submit-button">Add Hero</button>
             </form>
+
+            <ToastContainer />
         </div>
     );
 };
